@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+set -eu
+
+BUILD_PACKAGES_DEPENDENCIES='make patch'
+apk add --no-cache ${BUILD_PACKAGES_DEPENDENCIES}
+
+addgroup -S ${GEARMAN_GROUP}
+adduser -DS -h ${GEARMAN_HOME} -G ${GEARMAN_GROUP} -s /bin/false ${GEARMAN_USER}
+
+tar -xvf gearmand-${GEARMAND_VERSION}.tar.gz
+
+CBUILD=$(gcc -dumpmachine)
+CHOST=${CBUILD}
+
+(
+    cd gearmand-${GEARMAND_VERSION}
+    ./configure \
+        --build=${CBUILD} \
+        --host=${CHOST} \
+        --prefix=/usr \
+        --sysconfdir=/etc \
+        --mandir=/usr/share/man \
+        --localstatedir=/var \
+        --with-mysql=no \
+        --with-postgresql=no \
+        --disable-libpq \
+        --disable-libtokyocabinet \
+        --disable-libdrizzle \
+        --enable-ssl \
+        --enable-hiredis \
+        --enable-jobserver=no \
+        || exit 1
+    patch libhashkit/common.h ${DOCKAGE_ETC_DIR}/buildtime/libhashkit-common.h.patch
+    patch libtest/cmdline.cc ${DOCKAGE_ETC_DIR}/buildtime/libtest-cmdline.cc.patch
+    make || exit 1
+    make install || exit 1
+)
+
+rm -rf gearmand-${GEARMAND_VERSION}.tar.gz gearmand-${GEARMAND_VERSION}
+apk del ${BUILD_PACKAGES_DEPENDENCIES}

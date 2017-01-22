@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+set -eu
+
+GEARMAND_ARGS=${GEARMAND_ARGS:-}
+
+case ${1} in
+    gearmand:start)
+        echo "Starting Gearman ${GEARMAND_VERSION}..."
+        exec /usr/local/bin/gosu ${GEARMAN_USER}:${GEARMAN_GROUP} /usr/sbin/gearmand --log-file stderr ${GEARMAND_ARGS}
+        ;;
+    gearmand:help)
+        exec /usr/local/bin/gosu ${GEARMAN_USER}:${GEARMAN_GROUP} /usr/sbin/gearmand --help
+        ;;
+    *)
+        exec "$@"
+        ;;
+esac
