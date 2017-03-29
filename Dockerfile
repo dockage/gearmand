@@ -1,7 +1,7 @@
 FROM dockage/alpine:3.5
 MAINTAINER Mohammad Abdoli Rad <m.abdolirad@gmail.com>
 
-ENV GEARMAND_VERSION=1.1.14 \
+ENV GEARMAND_VERSION=1.1.15 \
     GEARMAN_USER=gearman \
     GEARMAN_GROUP=gearman \
     DOCKAGE_ETC_DIR=/etc/dockage
