@@ -1,7 +1,13 @@
-FROM dockage/alpine:3.5
-MAINTAINER Mohammad Abdoli Rad <m.abdolirad@gmail.com>
+FROM dockage/alpine:3.6
 
-ENV GEARMAND_VERSION=1.1.15 \
+LABEL maintainer="m.abdolirad@gmail.com" \
+    org.label-schema.name="gearmand" \
+    org.label-schema.vendor="Dockage" \
+    org.label-schema.description="Gearman provides a generic application framework to farm out work to other machines or processes that are better suited to do the work." \
+    org.label-schema.version="1.1.16" \
+    org.label-schema.license="MIT"
+
+ENV GEARMAND_VERSION=1.1.16 \
     GEARMAN_USER=gearman \
     GEARMAN_GROUP=gearman \
     DOCKAGE_ETC_DIR=/etc/dockage
@@ -20,4 +26,4 @@ RUN apk update \
 EXPOSE 4730/tcp
 
 ENTRYPOINT ["/sbin/entrypoint"]
-CMD ["gearmand:start"]
+CMD ["/sbin/su-exec", "${GEARMAN_USER}:${GEARMAN_GROUP}", "/usr/sbin/gearmand", "--log-file", "stderr"]
